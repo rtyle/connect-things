@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/rtyle/upnp-it/issues"
   },
-  "homepage": "https://github.com/rtyle/upnp-it#readme"
+  "homepage": "https://github.com/rtyle/upnp-it#readme",
+  "dependencies": {
+    "uuid": "^3.3.3"
+  }
 }
