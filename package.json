@@ -1,0 +1,30 @@
+{
+  "name": "upnp-it",
+  "version": "0.0.0",
+  "description": "Put a UPnP face on things",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rtyle/upnp-it.git"
+  },
+  "keywords": [
+    "SmartThings",
+    "Legrand",
+    "Adorne",
+    "LC7001",
+    "hub",
+    "RFLC",
+    "UPnP",
+    "BinaryLight",
+    "DimmableLight"
+  ],
+  "author": "Ross Tyler",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/rtyle/upnp-it/issues"
+  },
+  "homepage": "https://github.com/rtyle/upnp-it#readme"
+}
