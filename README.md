@@ -1,9 +1,9 @@
 # upnp-it
 Put a UPnP face on your things.
 
-Although this supports an architecture for providing a UPnP interface to general things, the only such things realized now are Switch and Dimmer devices reachable through a local Legrand Adorne LC7001 hub.
+Although this supports an architecture for providing a UPnP interface to general things, the only such things realized now are Switch and Dimmer devices reachable through a local [Legrand Adorne LC7001 hub](https://www.legrand.us/adorne/products/wireless-whole-house-lighting-controls/lc7001.aspx).
 
-The Legrand Adorne Switch and Dimmer devices will appear as device URNs
+The [Legrand Adorne Wi-Fi Ready Switch and Dimmer switch devices](https://www.legrand.us/adorne/products/wireless-whole-house-lighting-controls.aspx) will be discovered as device URNs
 * schemas-upnp-org:device:BinaryLight:1
 * schemas-upnp-org:device:DimmableLight:1
 
