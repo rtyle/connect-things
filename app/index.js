@@ -29,10 +29,10 @@ class App {
 			server: server
 		})
 		.on('ready', (peer) => {
-			console.log("ready");
+			console.log('upnp peer ready');
 		})
 		.on('close', (peer) => {
-			console.log("closed");
+			console.log('upnp peer closed');
 		})
 		.start();
 
