@@ -69,8 +69,8 @@ class App {
 		this.deviceTypeConstructorMap = new Map()
 
 		// discover UPnP Device constructors for UPnP light types
-		const Lights = require('../lib/upnp/lights')
-		new Lights(this.peer, (deviceType, deviceConstructor) => {
+		const LightingControls = require('../lib/upnp/lightingControls')
+		new LightingControls(this.peer, (deviceType, deviceConstructor) => {
 			console.log(`constructable ${deviceType}`)
 			this.deviceTypeConstructorMap
 				.set(deviceType, deviceConstructor)
