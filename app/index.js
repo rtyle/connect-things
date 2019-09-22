@@ -19,49 +19,96 @@ const http = require('http')
 
 const upnp = require('../peer-upnp/lib/peer-upnp')
 
+// An instance of App will provide UPnP Device interfaces
+// for Things that don't have them.
+// The UPnP Devices and Things are loosely coupled here.
+//
+// Anticipated UPnP Device factories are constructed
+// and tell us each UPnP deviceType they have a constructor for.
+//
+// Thing factories are created and expected to emit 'constructed'
+// events as things are dynamically discovered and constructed.
+// A constructed event comes with a UPnP deviceType and the constructed Thing.
+// If there is a known UPnP Device constructor for this deviceType
+// it is used to create and associate a UPnP Device interface for the Thing.
+//
+// The unique uuid property of a Thing
+// is used to remember the UPnP Device created for it.
+// When a Thing emits a 'changed' event,
+// the associated UPnP Device is found (using the Thing's uuid)
+// and forwarded the event using its expected 'changed' method.
+//
+// The UPnP Device implementation will expect a device specific interface
+// from the Thing implementation and vice-versa.
+// The 'changed' properties of a Thing are expected to be handled
+// by the 'changed' method of its UPnP Device.
+// Inversely, UPnP Device service actions will expect method support
+// from their Thing.
+// An App instance does not care about these details:
+// the Things and UPnP Devices can work these out for themselves.
 class App {
 	constructor() {
+		// create HTTP server to support UPnP
 		const server = http.createServer()
 		server.listen(8081)
 
+		// create the UPnP HTTP service for the server under /upnp
 		this.peer = upnp.createPeer({
 			prefix: "/upnp",
 			server: server
 		})
 		.on('ready', (peer) => {
-			console.log('upnp peer ready');
+			console.log('UPnP peer ready');
 		})
 		.on('close', (peer) => {
-			console.log('upnp peer closed');
+			console.log('UPnP peer closed');
 		})
 		.start();
 
+		// remember UPnP Device constructors by deviceType
 		this.constructorMap = new Map()
 
+		// discover UPnP Device constructors for UPnP light types
 		const Lights = require('../lib/upnp/lights')
 		new Lights(this.peer, (deviceType, deviceConstructor) => {
 			console.log(`constructable ${deviceType}`)
 			this.constructorMap.set(deviceType, deviceConstructor)
 		})
 
+		// remember Thing instances by their unique uuid property
 		this.instanceMap = new Map()
 
+		// construct a Legrand Adorne LC7001 Thing factory
+		// and handle its events
 		const LegrandFactory = require('../lib/it/legrand/factory')
 		new LegrandFactory()
 		.on('constructed', (deviceType, thing) => {
-			if (this.constructorMap.has(deviceType)) {
-				this.instanceMap.set(thing.uuid, this.constructorMap.get(deviceType)(deviceType, thing))
-			} else {
-				console.error('unconstructable', deviceType)
-			}
+			this.constructed(deviceType, thing)
 		})
 		.on('changed', (thing, serviceType, key, value) => {
-			if (this.instanceMap.has(thing.uuid)) {
-				this.instanceMap.get(thing.uuid).changed(thing, serviceType, key, value)
-			} else {
-				console.error('unknown', thing.uuid)
-			}
+			this.changed(thing, serviceType, key, value)
 		})
+	}
+
+	// construct a UPnP Device for the deviceType thing
+	constructed(deviceType, thing) {
+		if (this.constructorMap.has(deviceType)) {
+			this.instanceMap.set(thing.uuid,
+				this.constructorMap.get(deviceType)
+					(deviceType, thing))
+		} else {
+			console.error('unconstructable', deviceType)
+		}
+	}
+
+	// forward the changed Thing event to its UPnP Device
+	changed(thing, serviceType, key, value) {
+		if (this.instanceMap.has(thing.uuid)) {
+			this.instanceMap.get(thing.uuid)
+				.changed(thing, serviceType, key, value)
+		} else {
+			console.error('unknown', thing.uuid)
+		}
 	}
 }
 
