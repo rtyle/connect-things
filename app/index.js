@@ -21,13 +21,13 @@ const upnp = require('../peer-upnp/lib/peer-upnp')
 
 // An instance of App will provide UPnP Device interfaces
 // for Things that don't have them.
-// The UPnP Devices and Things are loosely coupled here.
+// The UPnP Device interfaces and Things are loosely coupled here.
 //
 // Anticipated UPnP Device factories are constructed
 // and tell us each UPnP deviceType they have a constructor for.
 //
 // Thing factories are created and expected to emit 'constructed'
-// events as things are dynamically discovered and constructed.
+// events as Things are dynamically discovered and constructed.
 // A constructed event comes with a UPnP deviceType and the constructed Thing.
 // If there is a known UPnP Device constructor for this deviceType
 // it is used to create and associate a UPnP Device interface for the Thing.
@@ -35,7 +35,7 @@ const upnp = require('../peer-upnp/lib/peer-upnp')
 // The unique uuid property of a Thing
 // is used to remember the UPnP Device created for it.
 // When a Thing emits a 'changed' event,
-// the associated UPnP Device is found (using the Thing's uuid)
+// the associated UPnP Device interface is found (using the Thing's uuid)
 // and forwarded the event using its expected 'changed' method.
 //
 // The UPnP Device implementation will expect a device specific interface
@@ -66,20 +66,21 @@ class App {
 		.start();
 
 		// remember UPnP Device constructors by deviceType
-		this.constructorMap = new Map()
+		this.deviceTypeConstructorMap = new Map()
 
 		// discover UPnP Device constructors for UPnP light types
 		const Lights = require('../lib/upnp/lights')
 		new Lights(this.peer, (deviceType, deviceConstructor) => {
 			console.log(`constructable ${deviceType}`)
-			this.constructorMap.set(deviceType, deviceConstructor)
+			this.deviceTypeConstructorMap
+				.set(deviceType, deviceConstructor)
 		})
 
 		// remember Thing instances by their unique uuid property
-		this.instanceMap = new Map()
+		this.thingInstanceMap = new Map()
 
 		// construct a Legrand Adorne LC7001 Thing factory
-		// and handle its events
+		// and handle its 'constructed' and 'changed' events
 		const LegrandFactory = require('../lib/things/legrand/factory')
 		new LegrandFactory()
 		.on('constructed', (deviceType, thing) => {
@@ -90,21 +91,21 @@ class App {
 		})
 	}
 
-	// construct a UPnP Device for the deviceType thing
+	// construct a UPnP Device interface for the deviceType of the Thing
 	constructed(deviceType, thing) {
-		if (this.constructorMap.has(deviceType)) {
-			this.instanceMap.set(thing.uuid,
-				this.constructorMap.get(deviceType)
+		if (this.deviceTypeConstructorMap.has(deviceType)) {
+			this.thingInstanceMap.set(thing.uuid,
+				this.deviceTypeConstructorMap.get(deviceType)
 					(deviceType, thing))
 		} else {
 			console.error('unconstructable', deviceType)
 		}
 	}
 
-	// forward the changed Thing event to its UPnP Device
+	// forward the changed Thing event to its UPnP Device interface
 	changed(thing, serviceType, key, value) {
-		if (this.instanceMap.has(thing.uuid)) {
-			this.instanceMap.get(thing.uuid)
+		if (this.thingInstanceMap.has(thing.uuid)) {
+			this.thingInstanceMap.get(thing.uuid)
 				.changed(thing, serviceType, key, value)
 		} else {
 			console.error('unknown', thing.uuid)
