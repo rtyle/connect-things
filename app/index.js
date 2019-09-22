@@ -42,7 +42,7 @@ const upnp = require('../peer-upnp/lib/peer-upnp')
 // from the Thing implementation and vice-versa.
 // The 'changed' properties of a Thing are expected to be handled
 // by the 'changed' method of its UPnP Device.
-// Inversely, UPnP Device service actions will expect method support
+// Conversely, UPnP Device service actions will expect method support
 // from their Thing.
 // An App instance does not care about these details:
 // the Things and UPnP Devices can work these out for themselves.
