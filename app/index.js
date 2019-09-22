@@ -48,18 +48,18 @@ class App {
 
 		const LegrandFactory = require('../lib/it/legrand/factory')
 		new LegrandFactory()
-		.on('constructed', (deviceType, it) => {
+		.on('constructed', (deviceType, thing) => {
 			if (this.constructorMap.has(deviceType)) {
-				this.instanceMap.set(it.uuid, this.constructorMap.get(deviceType)(deviceType, it))
+				this.instanceMap.set(thing.uuid, this.constructorMap.get(deviceType)(deviceType, thing))
 			} else {
 				console.error('unconstructable', deviceType)
 			}
 		})
-		.on('changed', (it, serviceType, key, value) => {
-			if (this.instanceMap.has(it.uuid)) {
-				this.instanceMap.get(it.uuid).changed(it, serviceType, key, value)
+		.on('changed', (thing, serviceType, key, value) => {
+			if (this.instanceMap.has(thing.uuid)) {
+				this.instanceMap.get(thing.uuid).changed(thing, serviceType, key, value)
 			} else {
-				console.error('unknown', it.uuid)
+				console.error('unknown', thing.uuid)
 			}
 		})
 	}
