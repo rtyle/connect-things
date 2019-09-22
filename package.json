@@ -1,5 +1,5 @@
 {
-  "name": "upnp-it",
+  "name": "upnp-things",
   "version": "0.0.0",
   "description": "Put a UPnP face on things",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rtyle/upnp-it.git"
+    "url": "git+https://github.com/rtyle/upnp-things.git"
   },
   "keywords": [
     "SmartThings",
@@ -25,9 +25,9 @@
   "author": "Ross Tyler",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/rtyle/upnp-it/issues"
+    "url": "https://github.com/rtyle/upnp-things/issues"
   },
-  "homepage": "https://github.com/rtyle/upnp-it#readme",
+  "homepage": "https://github.com/rtyle/upnp-things#readme",
   "dependencies": {
     "uuid": "^3.3.3"
   }

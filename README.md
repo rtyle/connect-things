@@ -1,4 +1,4 @@
-# upnp-it
+# upnp-things
 Put a UPnP face on your things.
 
 Although this supports an architecture for providing a UPnP interface to general things, the only such things realized now are Switch and Dimmer devices reachable through a local [Legrand Adorne LC7001 hub](https://www.legrand.us/adorne/products/wireless-whole-house-lighting-controls/lc7001.aspx).
