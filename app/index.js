@@ -17,6 +17,8 @@
 
 const http = require('http')
 
+const log4js = require('log4js')
+
 const upnp = require('../peer-upnp/lib/peer-upnp')
 
 // An instance of App will provide UPnP Device interfaces
@@ -48,11 +50,13 @@ const upnp = require('../peer-upnp/lib/peer-upnp')
 // the Things and UPnP Devices can work these out for themselves.
 class App {
 	constructor() {
+		this.upnpLogger	= log4js.getLogger('upnp')
+
 		// create HTTP server to support UPnP
 		const server = http.createServer()
 		server
 		.on('error', (error) => {
-			console.error('httpServer', error.name + ':', error.message)
+			this.upnpLogger.error('httpServer', error.name + ':', error.message)
 		})
 		.listen(8081)
 
@@ -62,10 +66,10 @@ class App {
 			server: server
 		})
 		.on('ready', (peer) => {
-			console.log('UPnP peer ready');
+			this.upnpLogger.info('peer ready');
 		})
 		.on('close', (peer) => {
-			console.log('UPnP peer closed');
+			this.upnpLogger.error('peer closed');
 		})
 		.start();
 
@@ -74,8 +78,9 @@ class App {
 
 		// discover UPnP Device constructors for UPnP light types
 		const LightingControls = require('../lib/upnp/lightingControls')
-		new LightingControls(this.peer, (deviceType, deviceConstructor) => {
-			console.log(`constructable ${deviceType}`)
+		new LightingControls(this.upnpLogger, this.peer,
+				(deviceType, deviceConstructor) => {
+			this.upnpLogger.info(`constructable ${deviceType}`)
 			this.deviceTypeConstructorMap
 				.set(deviceType, deviceConstructor)
 		})
@@ -86,7 +91,7 @@ class App {
 		// construct a Legrand Adorne LC7001 Thing factory
 		// and handle its 'constructed' and 'changed' events
 		const LegrandFactory = require('../lib/things/legrand/factory')
-		new LegrandFactory()
+		new LegrandFactory(log4js.getLogger('legrand'))
 		.on('constructed', (deviceType, thing) => {
 			this.constructed(deviceType, thing)
 		})
@@ -102,7 +107,7 @@ class App {
 				this.deviceTypeConstructorMap.get(deviceType)
 					(deviceType, thing))
 		} else {
-			console.error('unconstructable', deviceType)
+			this.upnpLogger.error('unconstructable', deviceType)
 		}
 	}
 
@@ -112,9 +117,11 @@ class App {
 			this.thingInstanceMap.get(thing.uuid)
 				.changed(thing, serviceType, key, value)
 		} else {
-			console.error('unknown', thing.uuid)
+			this.upnpLogger.error('unknown', thing.uuid)
 		}
 	}
 }
+
+log4js.configure('./log4js.json')
 
 new App

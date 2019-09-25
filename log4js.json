@@ -1,0 +1,10 @@
+{
+	"appenders": {
+		"out": {"type": "stdout"}
+	},
+	"categories": {
+		"default"	: {"appenders": ["out"], "level": "debug"},
+		"legrand"	: {"appenders": ["out"], "level": "debug"},
+		"upnp"		: {"appenders": ["out"], "level": "debug"}
+	}
+}

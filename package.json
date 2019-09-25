@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/rtyle/upnp-things#readme",
   "dependencies": {
+    "log4js": "^5.1.0",
     "uuid": "^3.3.3"
   }
 }
