@@ -50,7 +50,11 @@ class App {
 	constructor() {
 		// create HTTP server to support UPnP
 		const server = http.createServer()
-		server.listen(8081)
+		server
+		.on('error', (error) => {
+			console.error('httpServer', error.name + ':', error.message)
+		})
+		.listen(8081)
 
 		// create the UPnP HTTP service for the server under /upnp
 		this.peer = upnp.createPeer({
