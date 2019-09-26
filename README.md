@@ -17,36 +17,22 @@ A companion project is [upnp-connect](https://www.github.com/rtyle/upnp-connect)
 
 **upnp-things** is a JavaScript application that expects to be run in a [nodejs](https://nodejs.org/en/download/) environment.
 It was developed using, at the time, the *Latest LTS Version: 10.16.3* of nodejs.
-**upnp-things** can be installed using the Node Package Manager [npm](https://www.npmjs.com/get-npm).
-You can use *npm*, as a normal user, in an empty directory, to install **upnp-things** in this directory with all of its dependencies:
+**upnp-things** can be installed [git](https://git-scm.com/downloads) and the Node Package Manager [npm](https://www.npmjs.com/get-npm).
+You can use these, as a normal user, to install **upnp-things** with all of its dependencies:
 ```
-npm install upnp-things
+git clone https://github.com/rtyle/upnp-things
+(cd upnp-things; npm install)
 ```
-If the current directory is not already an npm managed project directory, npm will warn you about missing project files.
-It may also warn you on deprecated module usage. These warnings can be safely ignored:
-```
-npm WARN deprecated node-uuid@1.4.0: Use uuid module instead
-npm WARN saveError ENOENT: no such file or directory, open '/home/upnp-things/package.json'
-npm notice created a lockfile as package-lock.json. You should commit this file.
-npm WARN enoent ENOENT: no such file or directory, open '/home/upnp-things/package.json'
-npm WARN upnp-things No description
-npm WARN upnp-things No repository field.
-npm WARN upnp-things No README data
-npm WARN upnp-things No license field.
-```
-npm will create (or update) a package-lock.json file which describes the npm packages installed.
-The packages themselves can be found under a node_modules subdirectory.
-
 To inspect the **upnp-things** command line options and run it:
 ```
-node node_modules/upnp-things/index.js --help
-node node_modules/upnp-things/index.js
+node upnp-things/index.js --help
+node upnp-things/index.js
 ```
 One should be able to make this run automatically in most environments.
 It has been tested to run on Linux.
 ### Run as a Linux systemd service
 As root,
 ```
-cp node_modules/upnp-things/upnp-things.service /etc/systemd/system/
+cp upnp-things/upnp-things.service /etc/systemd/system/
 ```
 Read this file for further instructions.
