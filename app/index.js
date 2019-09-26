@@ -49,7 +49,7 @@ const upnp = require('../peer-upnp/lib/peer-upnp')
 // An App instance does not care about these details:
 // the Things and UPnP Devices can work these out for themselves.
 class App {
-	constructor() {
+	constructor(port, legrandPort, legrandHost) {
 		this.upnpLogger	= log4js.getLogger('upnp')
 
 		// create HTTP server to support UPnP
@@ -58,7 +58,7 @@ class App {
 			.on('error', (error) => {
 				this.upnpLogger.error('httpServer', error.name + ':', error.message)
 			})
-			.listen(8081)
+			.listen(port)
 
 			// create the UPnP HTTP service for the server under /upnp
 			this.peer = upnp.createPeer({
@@ -91,7 +91,8 @@ class App {
 		// construct a Legrand Adorne LC7001 Thing factory
 		// and handle its 'constructed' and 'changed' events
 		const LegrandFactory = require('../lib/things/legrand/factory')
-		new LegrandFactory(log4js.getLogger('legrand'))
+		new LegrandFactory(
+				log4js.getLogger('legrand'), legrandPort, legrandHost)
 			.on('constructed', (deviceType, thing) => {
 				this.constructed(deviceType, thing)
 			})
@@ -124,4 +125,13 @@ class App {
 
 log4js.configure('./log4js.json')
 
-new App
+const commander = require('commander')
+const program = new commander.Command()
+program
+	.version('0.0.0')
+	.option('-p, --port <port>', 'UPnP port', '8081')
+	.option('-l, --legrand-port <port>', 'Legrand LC7001 port', '2112')
+	.option('-L, --legrand-host <host>', 'Legrand LC7001 host', 'LCM1.local')
+	.parse(process.argv)
+
+new App(parseInt(program.port), parseInt(program.legrandPort), program.legrandHost)
