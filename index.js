@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // Copyright (c) 2019 Ross Tyler, all rights reserved.
 //
 // This file is part of upnp-things.
