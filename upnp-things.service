@@ -1,6 +1,7 @@
 # assuming
 #	* there is a upnp-things user this should be run as
-#	* upnp-things files reside in upnp-things mounted under /mnt/home1
+#	* upnp-things requires files that reside in upnp-things mounted under /mnt/home1
+#	* upnp-things requires on mDNS hostname resolution
 # as root,
 # define, notice, start and enable the systemd system upnp-things.service
 #	cp /home/upnp-things/upnp-things.service /etc/systemd/system/
@@ -11,9 +12,8 @@
 #	journalctl -f -u upnp-things
 
 [Unit]
-Description=upnp-things
 Documentation=https://www.github.com/rtyle/upnp-things
-After=network.target
+After=network.target avahi-daemon.service
 RequiresMountsFor=/mnt/home1
 
 [Service]
