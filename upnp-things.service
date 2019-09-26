@@ -1,7 +1,7 @@
 # assuming
 #	* there is a upnp-things user this should be run as
 #	* upnp-things requires files that reside in upnp-things mounted under /mnt/home1
-#	* upnp-things requires on mDNS hostname resolution
+#	* upnp-things requires mDNS host name resolution
 # as root,
 # define, notice, start and enable the systemd system upnp-things.service
 #	cp /home/upnp-things/upnp-things.service /etc/systemd/system/
