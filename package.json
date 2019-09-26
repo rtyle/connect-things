@@ -1,6 +1,6 @@
 {
   "name": "upnp-things",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Put a UPnP face on things",
   "main": "index.js",
   "scripts": {
