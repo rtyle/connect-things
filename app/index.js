@@ -123,7 +123,8 @@ class App {
 	}
 }
 
-log4js.configure('./log4js.json')
+const path = require('path')
+log4js.configure(path.format({dir: path.dirname(process.argv[1]), base: 'log4js.json'}))
 
 const commander = require('commander')
 const program = new commander.Command()
