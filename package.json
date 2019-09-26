@@ -1,6 +1,6 @@
 {
   "name": "upnp-things",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Put a UPnP face on things",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/rtyle/upnp-things/issues"
   },
-  "homepage": "https://github.com/rtyle/upnp-things#readme",
+  "homepage": "https://github.com/rtyle/upnp-things",
   "dependencies": {
     "commander": "^3.0.2",
     "log4js": "^5.1.0",
