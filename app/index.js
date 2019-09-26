@@ -123,9 +123,6 @@ class App {
 	}
 }
 
-const path = require('path')
-log4js.configure(path.format({dir: path.dirname(process.argv[1]), base: 'log4js.json'}))
-
 const commander = require('commander')
 const program = new commander.Command()
 program
@@ -133,6 +130,19 @@ program
 	.option('-p, --port <port>', 'UPnP port', '8081')
 	.option('-l, --legrand-port <port>', 'Legrand LC7001 port', '2112')
 	.option('-L, --legrand-host <host>', 'Legrand LC7001 host', 'LCM1.local')
+	.option('--legrand-log <level>', 'Logging level for Legrand', 'debug')
+	.option('--upnp-log <level>', 'Logging level for UPnP', 'debug')
 	.parse(process.argv)
+
+log4js.configure({
+	appenders: {
+		out: {type: 'stdout'}
+	},
+	categories: {
+		default	: {appenders: ['out'], level: 'debug'},
+		legrand	: {appenders: ['out'], level: program.legrandLog},
+		upnp	: {appenders: ['out'], level: program.upnpLog}
+	}
+})
 
 new App(parseInt(program.port), parseInt(program.legrandPort), program.legrandHost)
