@@ -1,10 +1,10 @@
 # assuming
 #	* there is a upnp-things user this should be run as
-#	* upnp-things requires files that reside in upnp-things mounted under /mnt/home1
+#	* upnp-things was npm-installed in the upnp-things directory under /mnt/home1
 #	* upnp-things requires mDNS host name resolution
 # as root,
 # define, notice, start and enable the systemd system upnp-things.service
-#	cp /home/upnp-things/upnp-things.service /etc/systemd/system/
+#	cp /home/upnp-things/node_modules/upnp-things/upnp-things.service /etc/systemd/system/
 #	systemctl daemon-reload
 #	systemctl start upnp-things
 #	systemctl enable upnp-things
@@ -19,7 +19,7 @@ RequiresMountsFor=/mnt/home1
 [Service]
 Type=simple
 User=upnp-things
-ExecStart=/usr/bin/node /mnt/home1/upnp-things/index.js --legrand-log=warn --upnp-log=warn
+ExecStart=/usr/bin/node /mnt/home1/upnp-things/node_modules/upnp-things/index.js --legrand-log=warn --upnp-log=warn
 Restart=on-failure
 
 [Install]
