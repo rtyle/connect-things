@@ -1,0 +1,25 @@
+# assuming
+#	* there is a upnp-things user this should be run as
+#	* upnp-things files reside in /home/upnp-things
+# as root,
+# define, notice, start and enable the systemd system upnp-things.service
+#	cp /home/upnp-things/upnp-things.service /etc/systemd/system/
+#	systemctl daemon-reload
+#	systemctl start upnp-things
+#	systemctl enable upnp-things
+# follow journaled output
+#	journalctl -f -u upnp-things
+
+[Unit]
+Description=upnp-things
+Documentation=https://www.github.com/rtyle/upnp-things
+After=network.target
+
+[Service]
+Type=simple
+User=upnp-things
+ExecStart=/usr/bin/node /home/upnp-things/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
