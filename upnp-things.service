@@ -19,7 +19,7 @@ RequiresMountsFor=/mnt/home1
 [Service]
 Type=simple
 User=upnp-things
-ExecStart=/usr/bin/node /mnt/home1/upnp-things/index.js
+ExecStart=/usr/bin/node /mnt/home1/upnp-things/index.js --legrand-log=warn --upnp-log=warn
 Restart=on-failure
 
 [Install]
