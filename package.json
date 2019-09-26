@@ -31,6 +31,7 @@
   "dependencies": {
     "commander": "^3.0.2",
     "log4js": "^5.1.0",
+    "peer-upnp": "git+https://github.com/rtyle/peer-upnp.git#renew-subscription",
     "uuid": "^3.3.3"
   }
 }

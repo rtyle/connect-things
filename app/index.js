@@ -19,7 +19,7 @@ const http = require('http')
 
 const log4js = require('log4js')
 
-const upnp = require('../peer-upnp/lib/peer-upnp')
+const upnp = require('peer-upnp')
 
 // An instance of App will provide UPnP Device interfaces
 // for Things that don't have them.
