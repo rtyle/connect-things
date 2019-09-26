@@ -55,23 +55,23 @@ class App {
 		// create HTTP server to support UPnP
 		const server = http.createServer()
 		server
-		.on('error', (error) => {
-			this.upnpLogger.error('httpServer', error.name + ':', error.message)
-		})
-		.listen(8081)
+			.on('error', (error) => {
+				this.upnpLogger.error('httpServer', error.name + ':', error.message)
+			})
+			.listen(8081)
 
-		// create the UPnP HTTP service for the server under /upnp
-		this.peer = upnp.createPeer({
-			prefix: "/upnp",
-			server: server
-		})
-		.on('ready', (peer) => {
-			this.upnpLogger.info('peer ready');
-		})
-		.on('close', (peer) => {
-			this.upnpLogger.error('peer closed');
-		})
-		.start();
+			// create the UPnP HTTP service for the server under /upnp
+			this.peer = upnp.createPeer({
+				prefix: "/upnp",
+				server: server
+			})
+			.on('ready', (peer) => {
+				this.upnpLogger.info('peer ready');
+			})
+			.on('close', (peer) => {
+				this.upnpLogger.error('peer closed');
+			})
+			.start();
 
 		// remember UPnP Device constructors by deviceType
 		this.deviceTypeConstructorMap = new Map()
@@ -92,12 +92,12 @@ class App {
 		// and handle its 'constructed' and 'changed' events
 		const LegrandFactory = require('../lib/things/legrand/factory')
 		new LegrandFactory(log4js.getLogger('legrand'))
-		.on('constructed', (deviceType, thing) => {
-			this.constructed(deviceType, thing)
-		})
-		.on('changed', (thing, serviceType, key, value) => {
-			this.changed(thing, serviceType, key, value)
-		})
+			.on('constructed', (deviceType, thing) => {
+				this.constructed(deviceType, thing)
+			})
+			.on('changed', (thing, serviceType, key, value) => {
+				this.changed(thing, serviceType, key, value)
+			})
 	}
 
 	// construct a UPnP Device interface for the deviceType of the Thing
