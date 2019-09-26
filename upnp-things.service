@@ -1,6 +1,6 @@
 # assuming
 #	* there is a upnp-things user this should be run as
-#	* upnp-things files reside in /home/upnp-things
+#	* upnp-things files reside in upnp-things mounted under /mnt/home1
 # as root,
 # define, notice, start and enable the systemd system upnp-things.service
 #	cp /home/upnp-things/upnp-things.service /etc/systemd/system/
@@ -14,11 +14,12 @@
 Description=upnp-things
 Documentation=https://www.github.com/rtyle/upnp-things
 After=network.target
+RequiresMountsFor=/mnt/home1
 
 [Service]
 Type=simple
 User=upnp-things
-ExecStart=/usr/bin/node /home/upnp-things/index.js
+ExecStart=/usr/bin/node /mnt/home1/upnp-things/index.js
 Restart=on-failure
 
 [Install]
