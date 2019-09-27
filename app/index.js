@@ -126,7 +126,7 @@ class App {
 const commander = require('commander')
 const program = new commander.Command()
 program
-	.version('1.0.6')
+	.version('1.0.7')
 	.option('-p, --port <port>', 'UPnP port', '8081')
 	.option('-l, --legrand-port <port>', 'Legrand LC7001 port', '2112')
 	.option('-L, --legrand-host <host>', 'Legrand LC7001 host', 'LCM1.local')
