@@ -60,8 +60,8 @@ class App {
 			})
 			.listen(port)
 
-			// create the UPnP HTTP service for the server under /upnp
-			this.peer = upnp.createPeer({
+		// create the UPnP HTTP service for the server under /upnp
+		this.peer = upnp.createPeer({
 				prefix: "/upnp",
 				server: server
 			})
