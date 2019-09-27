@@ -58,6 +58,11 @@ class App {
 			.on('error', (error) => {
 				this.upnpLogger.error('httpServer', error.name + ':', error.message)
 			})
+			.on('connection', (socket) => {
+				socket.on('error', (error) => {
+					this.upnpLogger.error('httpServer connection', error.name + ':', error.message)
+				})
+			})
 			.listen(port)
 
 		// create the UPnP HTTP service for the server under /upnp
