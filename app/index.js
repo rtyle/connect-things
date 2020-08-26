@@ -22,7 +22,7 @@ const log4js = require('log4js')
 const upnp = require('peer-upnp')
 
 // An instance of App will provide Device adapters
-// for Things that don't have them.
+// for Things that need to be connected.
 // The Device adapters and Things are loosely coupled here.
 //
 // Anticipated Device adapter factories are constructed
