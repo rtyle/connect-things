@@ -1,7 +1,7 @@
 {
-  "name": "upnp-things",
+  "name": "connect-things",
   "version": "1.0.9",
-  "description": "Put a UPnP face on things",
+  "description": "Connect your things",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rtyle/upnp-things.git"
+    "url": "git+https://github.com/rtyle/connect-things.git"
   },
   "keywords": [
     "SmartThings",
@@ -25,13 +25,15 @@
   "author": "Ross Tyler",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/rtyle/upnp-things/issues"
+    "url": "https://github.com/rtyle/connect-things/issues"
   },
-  "homepage": "https://github.com/rtyle/upnp-things",
+  "homepage": "https://github.com/rtyle/connect-things",
   "dependencies": {
     "commander": "^3.0.2",
+    "express": "^4.17.1",
     "log4js": "^5.1.0",
-    "peer-upnp": "git+https://github.com/rtyle/peer-upnp.git#upnp-things",
+    "peer-upnp": "git+https://github.com/rtyle/peer-upnp.git#connect-things",
+    "st-schema": "^1.3.4",
     "uuid": "^3.3.3"
   }
 }

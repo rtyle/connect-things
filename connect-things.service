@@ -1,0 +1,27 @@
+# assuming
+#	* there is a connect-things user this should be run as
+#	* connect-things was installed in the connect-things directory under /mnt/home1
+#	* connect-things requires mDNS host name resolution
+#	* smarthings.home is the DNS name for your SmartThings hub
+# as root,
+# define, notice, start and enable the systemd system connect-things.service
+#	cp /mnt/home1/connect-things/connect-things.service /etc/systemd/system/
+#	systemctl daemon-reload
+#	systemctl start connect-things
+#	systemctl enable connect-things
+# follow journaled output
+#	journalctl -f -u connect-things
+
+[Unit]
+Documentation=https://www.github.com/rtyle/connect-things
+After=network.target avahi-daemon.service
+RequiresMountsFor=/mnt/home1
+
+[Service]
+Type=simple
+User=connect-things
+ExecStart=/usr/bin/node /mnt/home1/connect-things/index.js --legrand-log=warn --upnp-log=warn -c2c-log=warn
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
