@@ -15,9 +15,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with connect-things.  If not, see <https://www.gnu.org/licenses/>.
 
+const fs = require('fs')
+
 const http = require('http')
+const https = require('https')
 
 const log4js = require('log4js')
+
+const uuidv3 = require('uuid/v3')
+const namespace = 'b091f0a6-e95a-11ea-b56e-ac220bcc9422'
 
 const upnp = require('peer-upnp')
 
@@ -49,11 +55,11 @@ const upnp = require('peer-upnp')
 // An App instance does not care about these details:
 // the Things and Device adapters can work these out for themselves.
 class App {
-	constructor(port, legrandPort, legrandHost, upnpHostAddresses) {
+	constructor(port, legrandPort, legrandHost, upnpHostAddresses, c2cOauthAddresses) {
 		// remember Device adapter constructors by deviceType
 		this.deviceAdapterConstructorMap = new Map()
 
-		// remember Device adapter instances by their Thing's unique uuid property
+		// remember Device adapter instances by their Thing's uuid
 		this.deviceAdapterInstanceMap = new Map()
 
 		this.logger = log4js.getLogger()
@@ -65,8 +71,8 @@ class App {
 		const express = require('express')
 		const app = express()
 			.use(express.json())
+			.use(express.urlencoded())
 
-		// create HTTP server to support Device adapters
 		const httpServer = http.createServer(app)
 		httpServer
 			.on('error', (error) => {
@@ -79,9 +85,39 @@ class App {
 			})
 			.listen(port)
 
+		// SmartThings insists on https protocol endpoints.
+		// We assume that such will be provided publicly by a service like ngrok
+		// which will tunnel such to our private http protocol endpoints.
+		// however, a private https protocol endpoint is desirable to restrict
+		// access to /c2c/oauth2/authorize to c2cOauthAddresses
+		// (say, those of our phone on the same LAN).
+		if (!(undefined === c2cOauthAddresses)) {
+			const httpsServer = https.createServer({
+				key:	fs.readFileSync('certificates/key.pem').toString(),
+				cert:	fs.readFileSync('certificates/cert.pem').toString(),
+			}, app)
+			httpsServer
+				.on('error', (error) => {
+					this.logger.error('httpsServer', error.name + ':', error.message)
+				})
+				.on('connection', (socket) => {
+					socket.on('error', (error) => {
+						this.logger.error('httpsServer connection', error.name + ':', error.message)
+					})
+				})
+				.listen(port + 1)
+		}
+
+		const c2cClientLocal		= require('../c2cClientLocal')
+		const c2cClientRemote		= require('../c2cClientRemote')
+		const access_token		= uuidv3(c2cClientLocal.secret, namespace)
+		const c2cRedirectUriMatch	= /https:\/\/c2c-(us|eu|ap)\.smartthings\.com\/oauth\/callback/
+
+		// prepare c2c interface and
 		// discover c2c Device adapters by deviceType
 		const C2cLightingControls = require('../lib/connect/c2c/lightingControls')
-		const c2cLightingControls = new C2cLightingControls(this.c2cLogger, (deviceType, constructor) => {
+		const c2cLightingControls = new C2cLightingControls(
+				this.c2cLogger, c2cClientRemote.id, c2cClientRemote.secret, (deviceType, constructor) => {
 			this.c2cLogger.info(`constructable ${deviceType}`)
 			let constructors
 			if (this.deviceAdapterConstructorMap.has(deviceType)) {
@@ -93,8 +129,51 @@ class App {
 		})
 
 		app.use('/c2c', express.Router()
-			.post('/', (request, response) => {
-				c2cLightingControls.handleHttpCallback(request, response)
+			.use('/oauth2', express.Router()
+				.get('/authorize', (request, response) => {
+					// this will come from an instance of the SmartThings app.
+					// access may/should be limited to c2cOauthAddresses
+					this.c2cLogger.info('>', request.socket.remoteAddress, '/c2c/oauth2/authorize')
+					if ((undefined === c2cOauthAddresses || c2cOauthAddresses.includes(request.socket.remoteAddress))
+							&& c2cClientLocal.id == request.query.client_id
+							&& request.query.redirect_uri.match(c2cRedirectUriMatch)
+							&& 'code' == request.query.response_type) {
+						this.code = uuidv3(request.query.state, namespace)
+						this.c2cLogger.info('<', 'redirect', request.query.redirect_uri)
+						response.redirect(request.query.redirect_uri
+							+ '?state=' + request.query.state
+							+ '&code='  + this.code)
+					} else {
+						this.c2cLogger.error('<', '401', request.socket.remoteAddress, 'c2c/oauth2/authorize')
+						response.sendStatus(401)
+					}
+				})
+				.post('/token', (request, response) => {
+					this.c2cLogger.info('>', request.socket.remoteAddress, '/c2c/oauth2/token')
+					if (c2cClientLocal.id == request.body.client_id
+							&& c2cClientLocal.secret == request.body.client_secret
+							&& request.body.redirect_uri.match(c2cRedirectUriMatch)
+							&& this.code == request.body.code
+							&& 'authorization_code' == request.body.grant_type) {
+						this.c2cLogger.info('<', 'access_token')
+						response.send({
+							token_type:	"Bearer",
+							access_token:	access_token
+						})
+					} else {
+						this.c2cLogger.error('<', '401', 'access_token')
+						response.sendStatus(401)
+					}
+				})
+			)
+			.post('/resource', (request, response) => {
+				this.c2cLogger.info('>', request.socket.remoteAddress, request.url, request.body)
+				if (access_token == request.body.authentication.token) {
+					c2cLightingControls.handleHttpCallback(request, response)
+				} else {
+					this.c2cLogger.error('<', '401', '/c2c/resource')
+					response.sendStatus(401)
+				}
 			})
 		)
 
@@ -123,7 +202,7 @@ class App {
 					this.peer.httpHandler(request, response)
 				} else {
 					this.upnpLogger.debug('forbidden', request.socket.remoteAddress, request.socket.remotePort, url)
-					response.sendStatus(403)
+					response.sendStatus(401)
 				}
 			})
 		)
@@ -190,7 +269,8 @@ program
 	.option('-p, --port <port>', 'http server port', '8081')
 	.option('-l, --legrand-port <port>', 'Legrand LC7001 port', '2112')
 	.option('-L, --legrand-host <host>', 'Legrand LC7001 host', 'LCM1.local')
-	.option('-U, --upnp-host <host>', 'UPnP host', 'smartthings.home')
+	.option('-U, --upnp-host <host>', 'UPnP host')
+	.option('-C, --c2c-oauth <host>', 'c2c host to oauth authorize')
 	.option('--c2c-log <level>', 'Logging level for c2c', 'debug')
 	.option('--upnp-log <level>', 'Logging level for UPnP', 'debug')
 	.option('--legrand-log <level>', 'Logging level for Legrand', 'debug')
@@ -217,6 +297,11 @@ const dns = require('dns')
 			? undefined
 			: net.isIP(program.upnpHost)
 				? [program.upnpHost]
-				: (await dns.promises.lookup(program.upnpHost, {all: true})).map(it => it.address)
+				: (await dns.promises.lookup(program.upnpHost, {all: true})).map(it => it.address),
+		undefined === program.c2cOauth
+			? undefined
+			: net.isIP(program.c2cOauth)
+				? [program.c2cOauth]
+				: (await dns.promises.lookup(program.c2cOauth, {all: true})).map(it => it.address)
 	)
 })()
