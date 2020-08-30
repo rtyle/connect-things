@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:export-ydpi="22.500002"
+   inkscape:export-xdpi="22.500002"
+   inkscape:export-filename="/home/ross/connect-things/connect-c2c-things.png"
+   sodipodi:docname="connect-c2c-things.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 270.93333 270.93334"
+   height="1024"
+   width="1024">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     inkscape:window-maximized="0"
+     inkscape:window-y="33"
+     inkscape:window-x="0"
+     inkscape:window-height="1437"
+     inkscape:window-width="1754"
+     units="px"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="561.25983"
+     inkscape:cx="320.37604"
+     inkscape:zoom="0.89797982"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <g
+       id="g30">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:141.111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.33621"
+         x="-0.42603546"
+         y="171.8847"
+         id="text12"
+         transform="scale(0.88817337,1.1259063)"><tspan
+           sodipodi:role="line"
+           id="tspan10"
+           x="-0.42603546"
+           y="171.8847"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:141.111px;font-family:Comfortaa;-inkscape-font-specification:'Comfortaa Bold';stroke-width:3.33621">C2C</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:50.8px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="25.455793"
+         y="55.386417"
+         id="text16"><tspan
+           sodipodi:role="line"
+           id="tspan14"
+           x="25.455793"
+           y="55.386417"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50.8px;font-family:Comfortaa;-inkscape-font-specification:'Comfortaa Bold';stroke-width:0.264583">connect</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:50.8px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="50.932022"
+         y="247.0538"
+         id="text20"><tspan
+           sodipodi:role="line"
+           id="tspan18"
+           x="50.932022"
+           y="247.0538"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50.8px;font-family:Comfortaa;-inkscape-font-specification:'Comfortaa Bold';stroke-width:0.264583">things</tspan></text>
+    </g>
+  </g>
+</svg>
