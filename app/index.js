@@ -110,7 +110,7 @@ class App {
 
 		const c2cClientLocal		= require('../c2cClientLocal')
 		const c2cClientRemote		= require('../c2cClientRemote')
-		const access_token		= uuidv3(c2cClientLocal.secret, namespace)
+		const access_token		= uuidv3(c2cClientLocal.id + c2cClientLocal.secret, namespace)
 		const c2cRedirectUriMatch	= /https:\/\/c2c-(us|eu|ap)\.smartthings\.com\/oauth\/callback/
 
 		// prepare c2c interface and
@@ -167,7 +167,7 @@ class App {
 				})
 			)
 			.post('/resource', (request, response) => {
-				this.c2cLogger.info('>', request.socket.remoteAddress, request.url, request.body)
+				this.c2cLogger.info('>', request.socket.remoteAddress, request.url, request.body.headers.interactionType)
 				if (access_token == request.body.authentication.token) {
 					c2cLightingControls.handleHttpCallback(request, response)
 				} else {
@@ -192,7 +192,7 @@ class App {
 			})
 			.start()
 
-		// forbid access to this.peer.httpHandler from other than upnpHostAddresses
+		// unauthorize access to this.peer.httpHandler from other than upnpHostAddresses
 		httpServer.removeListener('request', this.peer.httpHandler)
 		app.use(upnpPrefix, express.Router()
 			.all('*', (request, response) => {
@@ -201,7 +201,7 @@ class App {
 					request.url = url
 					this.peer.httpHandler(request, response)
 				} else {
-					this.upnpLogger.debug('forbidden', request.socket.remoteAddress, request.socket.remotePort, url)
+					this.upnpLogger.debug('unauthorized', request.socket.remoteAddress, request.socket.remotePort, url)
 					response.sendStatus(401)
 				}
 			})
