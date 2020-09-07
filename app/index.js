@@ -63,15 +63,13 @@ class App {
 		this.deviceAdapterInstanceMap = new Map()
 
 		this.logger = log4js.getLogger()
-
 		this.c2cLogger	= log4js.getLogger('c2c')
-
 		this.upnpLogger	= log4js.getLogger('upnp')
 
 		const express = require('express')
 		const app = express()
 			.use(express.json())
-			.use(express.urlencoded())
+			.use(express.urlencoded({extended: true}))
 
 		const httpServer = http.createServer(app)
 		httpServer
@@ -93,8 +91,8 @@ class App {
 		// (say, those of our phone on the same LAN).
 		if (!(undefined === c2cOauthAddresses)) {
 			const httpsServer = https.createServer({
-				key:	fs.readFileSync('certificates/key.pem').toString(),
-				cert:	fs.readFileSync('certificates/cert.pem').toString(),
+				key:	fs.readFileSync('etc/key.pem' , 'utf8'),
+				cert:	fs.readFileSync('etc/cert.pem', 'utf8'),
 			}, app)
 			httpsServer
 				.on('error', (error) => {
@@ -108,8 +106,8 @@ class App {
 				.listen(port + 1)
 		}
 
-		const c2cClientLocal		= require('../c2cClientLocal')
-		const c2cClientRemote		= require('../c2cClientRemote')
+		const c2cClientLocal		= require('../etc/c2cClientLocal')
+		const c2cClientRemote		= require('../etc/c2cClientRemote')
 		const access_token		= uuidv3(c2cClientLocal.id + c2cClientLocal.secret, namespace)
 		const c2cRedirectUriMatch	= /https:\/\/c2c-(us|eu|ap)\.smartthings\.com\/oauth\/callback/
 
