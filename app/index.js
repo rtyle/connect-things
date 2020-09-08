@@ -22,9 +22,6 @@ const https = require('https')
 
 const log4js = require('log4js')
 
-const uuidv3 = require('uuid/v3')
-const namespace = 'b091f0a6-e95a-11ea-b56e-ac220bcc9422'
-
 const upnp = require('peer-upnp')
 
 // An instance of App will provide Device adapters
@@ -83,6 +80,8 @@ class App {
 			})
 			.listen(port)
 
+		const key = fs.readFileSync('etc/key.pem' , 'utf8')
+
 		// SmartThings insists on https protocol endpoints.
 		// We assume that such will be provided publicly by a service like ngrok
 		// which will tunnel such to our private http protocol endpoints.
@@ -91,7 +90,7 @@ class App {
 		// (say, those of our phone on the same LAN).
 		if (!(undefined === c2cOauthAddresses)) {
 			const httpsServer = https.createServer({
-				key:	fs.readFileSync('etc/key.pem' , 'utf8'),
+				key:	key,
 				cert:	fs.readFileSync('etc/cert.pem', 'utf8'),
 			}, app)
 			httpsServer
@@ -108,8 +107,6 @@ class App {
 
 		const c2cClientLocal		= require('../etc/c2cClientLocal')
 		const c2cClientRemote		= require('../etc/c2cClientRemote')
-		const access_token		= uuidv3(c2cClientLocal.id + c2cClientLocal.secret, namespace)
-		const c2cRedirectUriMatch	= /https:\/\/c2c-(us|eu|ap)\.smartthings\.com\/oauth\/callback/
 
 		// prepare c2c interface and
 		// discover c2c Device adapters by deviceType
@@ -126,6 +123,21 @@ class App {
 			constructors.push(constructor)
 		})
 
+		const c2cRedirectUriMatch	= /https:\/\/c2c-(us|eu|ap)\.smartthings\.com\/oauth\/callback/
+
+		const algorithm		= 'HS256'
+		const sign		= {algorithm	:  algorithm}
+		const verify		= {algorithms	: [algorithm], secret: key}
+
+		const subjectToken	= {subject: 'token'}
+		const signAuthorization	= Object.assign({}, sign, {expiresIn: '1m'}, subjectToken)
+		const signRefresh	= Object.assign({}, sign, {expiresIn: '2d'}, subjectToken)
+		const subjectAccess	= {subject: 'access'}
+		const signAccess	= Object.assign({}, sign, {expiresIn: '1d'}, subjectAccess)
+
+		const jwt	= require('jsonwebtoken')
+		const ejwt	= require('express-jwt')
+
 		app.use('/c2c', express.Router()
 			.use('/oauth2', express.Router()
 				.get('/authorize', (request, response) => {
@@ -136,42 +148,53 @@ class App {
 							&& c2cClientLocal.id == request.query.client_id
 							&& request.query.redirect_uri.match(c2cRedirectUriMatch)
 							&& 'code' == request.query.response_type) {
-						this.code = uuidv3(request.query.state, namespace)
-						this.c2cLogger.info('<', 'redirect', request.query.redirect_uri)
-						response.redirect(request.query.redirect_uri
+						const redirect = request.query.redirect_uri
 							+ '?state=' + request.query.state
-							+ '&code='  + this.code)
+							+ '&code='  + jwt.sign({}, key, signAuthorization)
+						this.c2cLogger.info('<', 'redirect', redirect)
+						response.redirect(redirect)
 					} else {
 						this.c2cLogger.error('<', '401', request.socket.remoteAddress, 'c2c/oauth2/authorize')
 						response.sendStatus(401)
 					}
 				})
-				.post('/token', (request, response) => {
+				.post('/token',
+						ejwt(Object.assign({}, verify, subjectToken, {
+							getToken: (request) => {
+								switch (request.body.grant_type) {
+								case 'authorization_code'	: return request.body.code
+								case 'refresh_token'		: return request.body.refresh_token
+								default				: return undefined
+								}
+							}
+						})),
+						(request, response) => {
 					this.c2cLogger.info('>', request.socket.remoteAddress, '/c2c/oauth2/token')
 					if (c2cClientLocal.id == request.body.client_id
-							&& c2cClientLocal.secret == request.body.client_secret
-							&& request.body.redirect_uri.match(c2cRedirectUriMatch)
-							&& this.code == request.body.code
-							&& 'authorization_code' == request.body.grant_type) {
-						this.c2cLogger.info('<', 'access_token')
-						response.send({
-							token_type:	"Bearer",
-							access_token:	access_token
-						})
+							&& c2cClientLocal.secret == request.body.client_secret) {
+						const send = {
+							token_type:	'Bearer',
+							access_token:	jwt.sign({}, key, signAccess),
+							refresh_token:	jwt.sign({}, key, signRefresh),
+							expires_in:	60 * 60 * 24,	// 1d
+						}
+						this.c2cLogger.info('<', 'token', send)
+						response.send(send)
 					} else {
-						this.c2cLogger.error('<', '401', 'access_token')
+						this.c2cLogger.error('<', '401', 'token')
 						response.sendStatus(401)
 					}
 				})
 			)
-			.post('/resource', (request, response) => {
+			.post('/resource',
+					ejwt(Object.assign({}, verify, subjectAccess, {
+						getToken: (request) => {
+							return request.body.authentication.token
+						}
+					})),
+					(request, response) => {
 				this.c2cLogger.info('>', request.socket.remoteAddress, request.url, request.body.headers.interactionType)
-				if (access_token == request.body.authentication.token) {
-					c2cLightingControls.handleHttpCallback(request, response)
-				} else {
-					this.c2cLogger.error('<', '401', '/c2c/resource')
-					response.sendStatus(401)
-				}
+				c2cLightingControls.handleHttpCallback(request, response)
 			})
 		)
 
