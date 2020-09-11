@@ -62,6 +62,9 @@ ngrok http -subdomain=yoursubdomainhere 8081
 ```
 
 Replace *yoursubdomainhere* (above and below) with your chosen, unique, reliable custom [subdomain](https://ngrok.com/docs#http-subdomain).
+Every/any time that this changes you will need to update old/invalid references (For example, **Target URL** and **Token URI**, below).
+That is why it is best if you can ensure that such will never change.
+Likewise, if you move away the **ngrok** service (or **ngrok** otherwise breaks old/invalid references), such will have to be updated.
 
 The
 [SmartThings Developer Workspace](https://smartthings.developer.samsung.com/workspace)
@@ -146,10 +149,13 @@ You can then **Deploy to Test**.
 
 Run **connect-things** for first-time onboarding.
 ```
+cat README.certificates # and follow directions
 rm -f etc/c2cCallbackAuthentication.json
 rm -f etc/c2cCallbackUrls.json
 node . --c2c-oauth phone.home
 ```
+The certificate created is used for **connect-things** https service
+and its private key is also used to sign JWT tokens.
 Any etc/c2cCallback*.json files are removed first because they will be overwritten
 as part of establishing a new relationship with SmartThings.
 Old content will probably not work.
