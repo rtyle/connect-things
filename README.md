@@ -206,7 +206,7 @@ node .
 
 To remove this integration, click on any of its devices to **...Edit** it, go to **Linked Services** and **...Delete** it (**-**).
 
-SmartThings will be told as new devices are discovered and will immediately support them.
+SmartThings will be told as new devices are discovered by **connect-things** and will immediately support them.
 
 ## Automatic Run
 
