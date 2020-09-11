@@ -50,9 +50,10 @@ node . --upnp-host smartthings.home
 
 ## SmartThings Cloud Connector Schema App
 
-Assuming that SmartThings will not be able to reach the connect-things service directly,
+Assuming that SmartThings will not be able to reach the **connect-things** service directly,
 an [ngrok](https://ngrok.com/) (or equivalent) tunnel to it will be required.
-One side of the tunnel should target the port (default, 8081) of the connect-things host/service
+We assume that ngrok is used here.
+One side of the tunnel should target the port (default, 8081) of the **connect-things** host/service
 and the other side of the tunnel should be identified reliably with your custom [subdomain](https://ngrok.com/docs#http-subdomain).
 For example,
 
@@ -81,7 +82,7 @@ of the
 It will be a
 **Webhook Endpoint**
 with a
-*Target URL*
+**Target URL**
 of
 ```
 https://yoursubdomainhere.ngrok.io/c2c/resource
@@ -92,7 +93,7 @@ Set up the
 (connect-things).
 Follow the instructions in
 [etc/c2cClientLocal.js](https://github.com/rtyle/connect-things/blob/master/etc/c2cClientLocal.js)
-to generate (and remember) your own unique id and secret for the connect-things (local) client
+to generate (and remember) your own unique id and secret for the **connect-things** (local) client
 and use these to fill in the
 **Client ID**
 and
@@ -101,19 +102,19 @@ fields.
 
 The
 **Authorization URI**
-should be reachable from the device running the SmartThings app used to onboard connect-things.
-It is most secure (and advised) if this device is connected to the same LAN as the connect-things host.
+should be reachable from the device running the SmartThings app used to onboard **connect-things**.
+It is most secure (and advised) if this device is connected to the same LAN as the **connect-things** host.
 For example ...
 ```
 https://connect-things.home:8082/c2c/oauth2/authorize
 ```
-* where *connect-things.home* resolves to the host running connect-things (use IP address otherwise),
-* connect-things is running an http service on port 8081 (default)
-* and an https service on the next port (8082), dedicated to phone.home, which will only be so if run with the
+* where *connect-things.home* resolves to the host running **connect-things** (use IP address otherwise),
+* **connect-things** is running an http service on port 8081 (default)
+* and an https service on the next port (8082), dedicated to *phone.home*, which will only be so if run with the
 ```
 --c2c-auth phone.home
 ```
-... option where phone.home resolves to the host running the SmartThings app (use IP address otherwise) used to onboard connect-things.
+... option where *phone.home* resolves to the host running the SmartThings app (use IP address otherwise) used to onboard **connect-things**.
 
 The
 **Token URI**
@@ -143,7 +144,7 @@ and paste (remember) them into
 
 You can then **Deploy to Test**.
 
-Run connect-things for first-time onboarding.
+Run **connect-things** for first-time onboarding.
 ```
 rm -f etc/c2cCallbackAuthentication.json
 rm -f etc/c2cCallbackUrls.json
@@ -179,7 +180,7 @@ and
 that devices will be added to and click
 **Next**.
 
-The local SmartThings app should automatically be authenticated and tokens should be exchaged between connect-things and SmartThings.
+The local SmartThings app should automatically be authenticated and tokens should be exchaged between **connect-things** and SmartThings.
 ```
 Connection between SmartThings and connect-things is successful
 Close this page to finish setup.
@@ -191,7 +192,15 @@ Successfully connected to connect-things.
 Click
 **Done**.
 
+As there is no longer a need for authentication (access tokens have been exchanged and are renewable),
+**connect-things** should be restarted without the *--c2c-oauth phone.home* option.
+```
+node .
+```
 
+To remove this integration, click on any of its devices to **...Edit** it, go to **Linked Services** and **...Delete** it (**-**).
+
+SmartThings will be told as new devices are discovered and will immediately support them.
 
 ## Automatic Run
 
