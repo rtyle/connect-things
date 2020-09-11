@@ -204,7 +204,8 @@ SmartThings will be told as new devices are discovered and will immediately supp
 
 ## Automatic Run
 
-From the connect-things host, change directory to where it is 
+From the **connect-things** host, change directory to where it is installed.
+
 One should be able to make this run automatically in most environments.
 It has been tested to run on Linux.
 ### Run as a Linux systemd service
@@ -213,3 +214,6 @@ As root,
 cp connect-things/connect-things.service /etc/systemd/system/
 ```
 Read this file for further instructions.
+
+[Google](https://www.google.com/search?q=systemd+ngrok)
+will offer help running **ngrok** automatically with **systemd**.
