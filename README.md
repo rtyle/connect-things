@@ -52,7 +52,7 @@ node . --upnp-host smartthings.home
 
 Assuming that SmartThings will not be able to reach the **connect-things** service directly,
 an [ngrok](https://ngrok.com/) (or equivalent) tunnel to it will be required.
-We assume that ngrok is used here.
+We assume that **ngrok** is used here.
 One side of the tunnel should target the port (default, 8081) of the **connect-things** host/service
 and the other side of the tunnel should be identified reliably with your custom [subdomain](https://ngrok.com/docs#http-subdomain).
 For example,
