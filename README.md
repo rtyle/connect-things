@@ -38,7 +38,9 @@ node . --help
 node .
 ```
 
-## UPnP Connection Through a SmartThings Hub
+## UPnP Connect Through a SmartThings Hub
+
+This can be disabled with the *--disable upnp* command line option.
 
 A companion project is [upnp-connect](https://github.com/rtyle/upnp-connect) which connects these things through a local SmartThings hub to SmartThings device types with Switch and SwitchLevel capabilities.
 
@@ -49,6 +51,8 @@ node . --upnp-host smartthings.home
 ... where *smartthings.home* resolves to the SmartThings hub (use IP address otherwise).
 
 ## SmartThings Cloud Connector Schema App
+
+This can be disabled with the *--disable c2c* command line option.
 
 Assuming that SmartThings will not be able to reach the **connect-things** service directly,
 an [ngrok](https://ngrok.com/) (or equivalent) tunnel to it will be required.
