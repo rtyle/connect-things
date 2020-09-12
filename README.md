@@ -59,7 +59,7 @@ an [ngrok](https://ngrok.com/) (or equivalent) tunnel to it will be required.
 We assume that **ngrok** is used here.
 One side of the tunnel should target the port (default, 8081) of the **connect-things** host/service
 and the other side of the tunnel should be identified reliably with your custom [subdomain](https://ngrok.com/docs#http-subdomain).
-For example,
+For example, on the host running **connect-things**,
 
 ```
 ngrok http -subdomain=yoursubdomainhere 8081
