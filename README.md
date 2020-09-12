@@ -96,8 +96,7 @@ https://yoursubdomainhere.ngrok.io/c2c/resource
 ```
 
 Set up the
-*credentials required to access the cloud which hosts the devices*
-(connect-things).
+*credentials required to access the cloud which hosts the devices*.
 Follow the instructions in
 [etc/c2cClientLocal.js](https://github.com/rtyle/connect-things/blob/master/etc/c2cClientLocal.js)
 to generate (and remember) your own unique id and secret for the **connect-things** (local) client
@@ -109,8 +108,8 @@ fields.
 
 The
 **Authorization URI**
-should be reachable from the device running the SmartThings app used to onboard **connect-things**.
-It is most secure (and advised) if this device is connected to the same LAN as the **connect-things** host.
+need only be reachable from the device running the SmartThings app used to onboard **connect-things**.
+It is most secure (and advised) if this device is reachable on the same LAN as the **connect-things** host.
 For example ...
 ```
 https://connect-things.home:8082/c2c/oauth2/authorize
@@ -121,7 +120,7 @@ https://connect-things.home:8082/c2c/oauth2/authorize
 ```
 --c2c-auth phone.home
 ```
-... option where *phone.home* resolves to the host running the SmartThings app (use IP address otherwise) used to onboard **connect-things**.
+option where *phone.home* resolves to the host running the SmartThings app (use IP address otherwise) used to onboard **connect-things**.
 
 The
 **Token URI**
@@ -137,7 +136,7 @@ should be left empty.
 Next, fill in the
 **App Display Name**
 with, say
-"connect-things"
+*connect-things*
 and choose a logo, say
 [connect-c2c-things.png](https://github.com/rtyle/connect-things/blob/master/connect-c2c-things.png)
 
@@ -158,16 +157,11 @@ rm -f etc/c2cCallbackAuthentication.json
 rm -f etc/c2cCallbackUrls.json
 node . --c2c-oauth phone.home
 ```
-The certificate created is used for **connect-things** https service
+The certificate created is used for the **connect-things** https service
 and its private key is also used to sign JWT tokens.
 Any etc/c2cCallback*.json files are removed first because they will be overwritten
 as part of establishing a new relationship with SmartThings.
 Old content will probably not work.
-Expect
-```
-<timestamp> [ERROR] c2c - < <deviceFriendlyName> callback undefined
-```
-messages from each device until the new relationship is forged.
 
 From the SmartThings app (run on phone.home),
 [enable Developer Mode](https://smartthings.developer.samsung.com/docs/testing/developer-mode.html)
@@ -202,15 +196,15 @@ Successfully connected to connect-things.
 Click
 **Done**.
 
-As there is no longer a need for authentication (access tokens have been exchanged and are renewable),
+As there is no longer a need for authentication (access tokens have been exchanged and can be refreshed),
 **connect-things** should be restarted without the *--c2c-oauth phone.home* option.
 ```
 node .
 ```
 
-To remove this integration, click on any of its devices to **...Edit** it, go to **Linked Services** and **...Delete** it (**-**).
-
 SmartThings will be told as new devices are discovered by **connect-things** and will immediately support them.
+
+To remove this integration, click on any of its devices to **...Edit** it, go to **Linked Services** and **...Delete** it (**-**).
 
 ## Automatic Run
 
