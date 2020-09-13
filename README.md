@@ -184,6 +184,7 @@ and
 that devices will be added to and click
 **Next**.
 
+The local SmartThings app will not automatically trust the self-signed certificate created above so you must tell it to.
 The local SmartThings app should automatically be authenticated and tokens should be exchaged between **connect-things** and SmartThings.
 ```
 Connection between SmartThings and connect-things is successful
