@@ -59,11 +59,9 @@ class App {
 		// remember Device adapter instances by their Thing's uuid
 		this.deviceAdapterInstanceMap = new Map()
 
-		this.logger = log4js.getLogger()
-		this.c2cLogger	= log4js.getLogger('c2c')
-		this.upnpLogger	= log4js.getLogger('upnp')
-
 		if (0 < connectSet.size) {
+			const logger = log4js.getLogger()
+
 			const express = require('express')
 			const app = express()
 				.use(express.json())
@@ -72,16 +70,18 @@ class App {
 			const httpServer = http.createServer(app)
 			httpServer
 				.on('error', (error) => {
-					this.logger.error('httpServer', error.name + ':', error.message)
+					logger.error('httpServer', error.name + ':', error.message)
 				})
 				.on('connection', (socket) => {
 					socket.on('error', (error) => {
-						this.logger.error('httpServer connection', error.name + ':', error.message)
+						logger.error('httpServer connection', error.name + ':', error.message)
 					})
 				})
 				.listen(port)
 
 			if (connectSet.has('c2c')) {
+				const c2cLogger	= log4js.getLogger('c2c')
+
 				const key = fs.readFileSync('etc/key.pem' , 'utf8')
 
 				// SmartThings insists on https protocol endpoints.
@@ -97,11 +97,11 @@ class App {
 					}, app)
 					httpsServer
 						.on('error', (error) => {
-							this.logger.error('httpsServer', error.name + ':', error.message)
+							c2cLogger.error('httpsServer', error.name + ':', error.message)
 						})
 						.on('connection', (socket) => {
 							socket.on('error', (error) => {
-								this.logger.error('httpsServer connection', error.name + ':', error.message)
+								c2cLogger.error('httpsServer connection', error.name + ':', error.message)
 							})
 						})
 						.listen(port + 1)
@@ -114,8 +114,8 @@ class App {
 				// discover c2c Device adapters by deviceType
 				const C2cLightingControls = require('../lib/connect/c2c/lightingControls')
 				const c2cLightingControls = new C2cLightingControls(
-						this.c2cLogger, c2cClientRemote.id, c2cClientRemote.secret, (deviceType, constructor) => {
-					this.c2cLogger.info(`constructable ${deviceType}`)
+						c2cLogger, c2cClientRemote.id, c2cClientRemote.secret, (deviceType, constructor) => {
+					c2cLogger.info(`constructable ${deviceType}`)
 					let constructors
 					if (this.deviceAdapterConstructorMap.has(deviceType)) {
 						constructors = this.deviceAdapterConstructorMap.get(deviceType)
@@ -145,7 +145,7 @@ class App {
 						.get('/authorize', (request, response) => {
 							// this will come from an instance of the SmartThings app.
 							// access may/should be limited to c2cOauthAddresses
-							this.c2cLogger.info('>', request.socket.remoteAddress, '/c2c/oauth2/authorize')
+							c2cLogger.info('>', request.socket.remoteAddress, '/c2c/oauth2/authorize')
 							if ((undefined === c2cOauthAddresses || c2cOauthAddresses.includes(request.socket.remoteAddress))
 									&& c2cClientLocal.id == request.query.client_id
 									&& request.query.redirect_uri.match(c2cRedirectUriMatch)
@@ -153,10 +153,10 @@ class App {
 								const redirect = request.query.redirect_uri
 									+ '?state=' + request.query.state
 									+ '&code='  + jwt.sign({}, key, signAuthorization)
-								this.c2cLogger.info('<', 'redirect', redirect)
+								c2cLogger.info('<', 'redirect', redirect)
 								response.redirect(redirect)
 							} else {
-								this.c2cLogger.error('<', '401', request.socket.remoteAddress, 'c2c/oauth2/authorize')
+								c2cLogger.error('<', '401', request.socket.remoteAddress, 'c2c/oauth2/authorize')
 								response.sendStatus(401)
 							}
 						})
@@ -171,7 +171,7 @@ class App {
 									}
 								})),
 								(request, response) => {
-							this.c2cLogger.info('>', request.socket.remoteAddress, '/c2c/oauth2/token')
+							c2cLogger.info('>', request.socket.remoteAddress, '/c2c/oauth2/token')
 							if (c2cClientLocal.id == request.body.client_id
 									&& c2cClientLocal.secret == request.body.client_secret) {
 								const send = {
@@ -180,10 +180,10 @@ class App {
 									refresh_token:	jwt.sign({}, key, signRefresh),
 									expires_in:	60 * 60 * 24,	// 1d
 								}
-								this.c2cLogger.info('<', 'token', send)
+								c2cLogger.info('<', 'token', send)
 								response.send(send)
 							} else {
-								this.c2cLogger.error('<', '401', 'token')
+								c2cLogger.error('<', '401', 'token')
 								response.sendStatus(401)
 							}
 						})
@@ -195,38 +195,40 @@ class App {
 								}
 							})),
 							(request, response) => {
-						this.c2cLogger.info('>', request.socket.remoteAddress, request.url, request.body.headers.interactionType)
+						c2cLogger.info('>', request.socket.remoteAddress, request.url, request.body.headers.interactionType)
 						c2cLightingControls.handleHttpCallback(request, response)
 					})
 				)
 			}
 
 			if (connectSet.has('upnp')) {
+				const upnpLogger = log4js.getLogger('upnp')
+
 				const upnpPrefix = '/upnp'
 
 				// create the UPnP HTTP service for the server under upnpPrefix
-				this.peer = upnp.createPeer({
+				const peer = upnp.createPeer({
 						prefix: upnpPrefix,
-						server: httpServer	// causes this.peer.httpHandler to be defined and listening
+						server: httpServer	// causes peer.httpHandler to be defined and listening
 					})
 					.on('ready', (peer) => {
-						this.upnpLogger.info('peer ready')
+						upnpLogger.info('peer ready')
 					})
 					.on('close', (peer) => {
-						this.upnpLogger.error('peer closed')
+						upnpLogger.error('peer closed')
 					})
 					.start()
 
-				// unauthorize access to this.peer.httpHandler from other than upnpHostAddresses
-				httpServer.removeListener('request', this.peer.httpHandler)
+				// unauthorize access to peer.httpHandler from other than upnpHostAddresses
+				httpServer.removeListener('request', peer.httpHandler)
 				app.use(upnpPrefix, express.Router()
 					.all('*', (request, response) => {
 						const url = upnpPrefix + request.url
 						if (undefined === upnpHostAddresses || upnpHostAddresses.includes(request.socket.remoteAddress)) {
 							request.url = url
-							this.peer.httpHandler(request, response)
+							peer.httpHandler(request, response)
 						} else {
-							this.upnpLogger.debug('unauthorized', request.socket.remoteAddress, request.socket.remotePort, url)
+							upnpLogger.debug('unauthorized', request.socket.remoteAddress, request.socket.remotePort, url)
 							response.sendStatus(401)
 						}
 					})
@@ -234,8 +236,8 @@ class App {
 
 				// discover UPnP Device adapters by deviceType
 				const upnpLightingControls = require('../lib/connect/upnp/lightingControls')
-				new upnpLightingControls(this.upnpLogger, this.peer, (deviceType, constructor) => {
-					this.upnpLogger.info(`constructable ${deviceType}`)
+				new upnpLightingControls(upnpLogger, peer, (deviceType, constructor) => {
+					upnpLogger.info(`constructable ${deviceType}`)
 					let constructors
 					if (this.deviceAdapterConstructorMap.has(deviceType)) {
 						constructors = this.deviceAdapterConstructorMap.get(deviceType)
