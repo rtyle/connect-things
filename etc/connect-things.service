@@ -15,12 +15,13 @@
 [Unit]
 Documentation=https://www.github.com/rtyle/connect-things
 After=network.target avahi-daemon.service
-RequiresMountsFor=/mnt/home1
+RequiresMountsFor=/
 
 [Service]
 Type=simple
 User=connect-things
-ExecStart=/usr/bin/node /mnt/home1/connect-things/index.js --legrand-log=warn --upnp-log=warn -c2c-log=warn
+WorkingDirectory=/home/connect-things/connect-things
+ExecStart=/usr/bin/node . --legrand-log=warn --upnp-log=warn -c2c-log=warn
 Restart=on-failure
 
 [Install]
