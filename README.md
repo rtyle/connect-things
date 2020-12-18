@@ -216,7 +216,7 @@ It has been tested to run on Linux.
 ### Run as a Linux systemd service
 As root,
 ```
-cp connect-things/connect-things.service /etc/systemd/system/
+cp etc/connect-things/connect-things.service /etc/systemd/system/
 ```
 Read this file for further instructions.
 
