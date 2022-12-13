@@ -30,7 +30,7 @@
   "homepage": "https://github.com/rtyle/connect-things",
   "dependencies": {
     "commander": "^3.0.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-jwt": "^6.0.0",
     "log4js": "^5.1.0",
     "peer-upnp": "git+https://github.com/rtyle/peer-upnp.git#upnp-things",
